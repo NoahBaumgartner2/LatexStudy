@@ -155,7 +155,7 @@ ${summary}
 // ── Gemini-Anfrage ───────────────────────────────────────────────────────────
 async function summarizeWithGemini(apiKey, pdfBuffer, fileName, subjectHint) {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-preview' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
   const pdfBase64 = pdfBuffer.toString('base64');
 
