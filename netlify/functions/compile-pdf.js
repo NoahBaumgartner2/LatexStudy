@@ -1,18 +1,30 @@
 const https = require('https');
+const crypto = require('crypto');
 
 function compileLatex(latexContent) {
   return new Promise((resolve, reject) => {
-    const params = new URLSearchParams();
-    params.set('text', latexContent);
-    const postData = params.toString();
+    const boundary = '----TeXBoundary' + crypto.randomBytes(12).toString('hex');
+    const crlf = '\r\n';
+
+    const field = (name, value) =>
+      `--${boundary}${crlf}Content-Disposition: form-data; name="${name}"${crlf}${crlf}${value}${crlf}`;
+
+    const bodyStr =
+      field('filecontents[]', latexContent) +
+      field('filename[]', 'document.tex') +
+      field('engine', 'pdflatex') +
+      field('return', 'pdf') +
+      `--${boundary}--${crlf}`;
+
+    const body = Buffer.from(bodyStr, 'utf8');
 
     const options = {
-      hostname: 'latexonline.cc',
-      path: '/compile',
+      hostname: 'texlive.net',
+      path: '/cgi-bin/latexcgi',
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(postData)
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        'Content-Length': body.length
       }
     };
 
@@ -25,7 +37,9 @@ function compileLatex(latexContent) {
         if (res.statusCode === 200 && ct.includes('application/pdf')) {
           resolve(result);
         } else {
-          reject(new Error(`Kompilierung fehlgeschlagen (${res.statusCode}): ${result.toString('utf8').substring(0, 400)}`));
+          reject(new Error(
+            `Kompilierung fehlgeschlagen (${res.statusCode}): ${result.toString('utf8').substring(0, 500)}`
+          ));
         }
       });
     });
@@ -33,10 +47,10 @@ function compileLatex(latexContent) {
     req.on('error', reject);
     req.setTimeout(24000, () => {
       req.destroy();
-      reject(new Error('Zeitüberschreitung bei der LaTeX-Kompilierung (24s). Versuche es erneut oder nutze Overleaf.'));
+      reject(new Error('Zeitüberschreitung (24s). Bitte nutze stattdessen "In Overleaf öffnen".'));
     });
 
-    req.write(postData);
+    req.write(body);
     req.end();
   });
 }
