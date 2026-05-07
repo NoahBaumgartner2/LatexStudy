@@ -2,6 +2,9 @@
   publish = "public"
   functions = "netlify/functions"
 
+[functions]
+  timeout = 26
+
 [[redirects]]
   from = "/api/summarize"
   to = "/.netlify/functions/summarize"
@@ -10,4 +13,9 @@
 [[redirects]]
   from = "/api/latex-only"
   to = "/.netlify/functions/latex-only"
+  status = 200
+
+[[redirects]]
+  from = "/api/compile-pdf"
+  to = "/.netlify/functions/compile-pdf"
   status = 200
