@@ -2,7 +2,7 @@
   publish = "public"
   functions = "netlify/functions"
 
-[functions]
+[functions."compile-pdf"]
   timeout = 26
 
 [[redirects]]
