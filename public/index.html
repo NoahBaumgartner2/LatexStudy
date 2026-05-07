@@ -620,7 +620,13 @@
       setProgress(50, 'Gemini erstellt ausführliche Zusammenfassung…');
 
       const res = await fetch('/api/summarize', { method: 'POST', body: formData });
-      const data = await res.json();
+      const rawText = await res.text();
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        throw new Error(`Server-Fehler (${res.status}): ${rawText.substring(0, 300)}`);
+      }
 
       if (!res.ok || !data.success) throw new Error(data.error || 'Unbekannter Fehler');
 
