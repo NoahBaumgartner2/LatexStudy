@@ -8,7 +8,7 @@ const { execSync, exec } = require('child_process');
 const tmp = require('tmp');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 // Multer: PDF uploads im Arbeitsspeicher
 const storage = multer.memoryStorage();
